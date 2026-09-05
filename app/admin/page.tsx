@@ -11,8 +11,16 @@ export default async function AdminDashboardPage() {
     redirect('/admin/login')
   }
 
-  const [totalProducts, activeProducts, featuredProducts, totalCategories, totalClicks, popularProducts, recentProducts] =
-    await Promise.all([
+  let totalProducts = 0
+  let activeProducts = 0
+  let featuredProducts = 0
+  let totalCategories = 0
+  let totalClicks = 0
+  let popularProducts: any[] = []
+  let recentProducts: any[] = []
+
+  try {
+    const results = await Promise.all([
       prisma.product.count(),
       prisma.product.count({ where: { isActive: true } }),
       prisma.product.count({ where: { isFeatured: true } }),
@@ -32,6 +40,17 @@ export default async function AdminDashboardPage() {
         include: { category: { select: { name: true } } },
       }),
     ])
+
+    totalProducts = results[0]
+    activeProducts = results[1]
+    featuredProducts = results[2]
+    totalCategories = results[3]
+    totalClicks = results[4]
+    popularProducts = results[5] || []
+    recentProducts = results[6] || []
+  } catch (error) {
+    console.error('Error fetching admin dashboard metrics:', error)
+  }
 
   return (
     <div className="space-y-8">
@@ -132,10 +151,10 @@ export default async function AdminDashboardPage() {
                         <span className="font-bold text-slate-900 truncate max-w-xs">{p.title}</span>
                       </div>
                     </td>
-                    <td className="p-3 text-slate-500">{p.category.name}</td>
+                    <td className="p-3 text-slate-500">{p.category?.name || 'N/A'}</td>
                     <td className="p-3 text-right">
                       <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full font-bold">
-                        {p._count.clicks} clicks
+                        {p._count?.clicks || 0} clicks
                       </span>
                     </td>
                   </tr>

@@ -2,190 +2,274 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getAdminFromCookie } from '@/lib/auth'
 
-const MULTI_CATEGORY_MASTER_LIBRARY = [
-  // Electronics
+interface MasterProduct {
+  title: string
+  slug: string
+  categorySlug: string
+  amazonAffiliateUrl: string
+  imageUrl: string
+  price: number
+  originalPrice?: number
+  rating: number
+  reviewCount: number
+  shortDescription: string
+  description: string
+  features: string[]
+  pros: string[]
+  cons: string[]
+  isFeatured?: boolean
+  isDeal?: boolean
+}
+
+const MULTI_CATEGORY_MASTER_LIBRARY: MasterProduct[] = [
+  // 1. Electronics
   {
-    name: 'Sony WH-1000XM5 Premium Noise Canceling Headphones',
-    cat: 'electronics',
+    title: 'Sony WH-1000XM5 Premium Noise Canceling Headphones',
+    slug: 'sony-wh-1000xm5-premium-headphones',
+    categorySlug: 'electronics',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B09XS7JWHH?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
     price: 398.00,
-    origPrice: 449.99,
+    originalPrice: 449.99,
     rating: 4.7,
-    reviews: 24500,
-    img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
-    desc: 'Industry-leading noise canceling with two processors and 8 microphones for unprecedented sound quality.',
+    reviewCount: 24500,
+    shortDescription: 'Industry-leading noise canceling with two processors and 8 microphones for unprecedented sound quality.',
+    description: 'Industry-leading noise canceling with two processors and 8 microphones for unprecedented sound quality and crystal clear hands-free calling.',
     features: ['Industry Leading ANC', '30-Hour Battery Life', 'Ultra Comfortable Lightweight Design'],
     pros: ['Top tier noise cancellation', 'Crisp audio balance', 'Fast USB-C charging'],
     cons: ['Non-foldable headband design'],
+    isFeatured: true,
+    isDeal: true,
   },
   {
-    name: 'Anker Soundcore Motion+ Bluetooth Speaker Hi-Res Audio',
-    cat: 'electronics',
+    title: 'Anker Soundcore Motion+ Bluetooth Speaker Hi-Res Audio',
+    slug: 'anker-soundcore-motion-plus-speaker',
+    categorySlug: 'electronics',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B07P39MLKH?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800',
     price: 99.99,
-    origPrice: 119.99,
+    originalPrice: 119.99,
     rating: 4.6,
-    reviews: 18200,
-    img: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800',
-    desc: 'Stunning Hi-Res audio enhanced by Qualcomm aptX for lossless music playback when streaming via Bluetooth.',
+    reviewCount: 18200,
+    shortDescription: 'Stunning Hi-Res audio enhanced by Qualcomm aptX for lossless music playback when streaming via Bluetooth.',
+    description: 'Stunning Hi-Res audio enhanced by Qualcomm aptX for lossless music playback. Ultra wide frequency range stretching from 50 Hz to 40 kHz.',
     features: ['Hi-Res Audio Certified', '30W Ultra-Wide Frequency', 'IPX7 Waterproof'],
     pros: ['Remarkable sound clarity for price', 'Fully customizable EQ app', 'Solid build'],
     cons: ['Slightly heavy for portable size'],
+    isFeatured: false,
+    isDeal: true,
   },
 
-  // Home & Kitchen
+  // 2. Home & Kitchen
   {
-    name: 'Ninja Foodi 6-in-1 2-Basket Air Fryer 8 Qt',
-    cat: 'home-kitchen',
+    title: 'Ninja Foodi 6-in-1 2-Basket Air Fryer 8 Qt',
+    slug: 'ninja-foodi-6-in-1-dual-basket-air-fryer-8qt',
+    categorySlug: 'home-kitchen',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B089TQ816K?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=800',
     price: 179.99,
-    origPrice: 199.99,
+    originalPrice: 199.99,
     rating: 4.8,
-    reviews: 42100,
-    img: 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=800',
-    desc: '2 independent baskets let you cook 2 foods, 2 ways, at the same time, eliminating back-to-back cooking.',
+    reviewCount: 42100,
+    shortDescription: '2 independent baskets let you cook 2 foods, 2 ways, at the same time, eliminating back-to-back cooking.',
+    description: '2 independent baskets let you cook 2 foods, 2 ways, at the same time. DualZone technology features Match Cook & Smart Finish buttons.',
     features: ['Dual Basket Design', '6 Versatile Cooking Functions', 'Match Cook & Smart Finish'],
     pros: ['Cooks 2 separate meals simultaneously', 'Huge 8-quart capacity', 'Easy cleanup'],
     cons: ['Takes substantial counter space'],
+    isFeatured: true,
+    isDeal: true,
   },
   {
-    name: 'Nespresso VertuoPlus Coffee and Espresso Machine by DeLonghi',
-    cat: 'home-kitchen',
+    title: 'Nespresso VertuoPlus Coffee and Espresso Machine by DeLonghi',
+    slug: 'nespresso-vertuoplus-coffee-espresso-machine-delonghi',
+    categorySlug: 'home-kitchen',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B01N7T5F8H?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800',
     price: 159.00,
-    origPrice: 199.00,
+    originalPrice: 199.00,
     rating: 4.6,
-    reviews: 31200,
-    img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800',
-    desc: 'Single-serve coffee maker using Centrifusion technology to gently brew gourmet coffee and espresso.',
+    reviewCount: 31200,
+    shortDescription: 'Single-serve coffee maker using Centrifusion technology to gently brew gourmet coffee and espresso.',
+    description: 'Single-serve coffee maker using Centrifusion technology to gently brew gourmet coffee and authentic espresso with a generous crema layer.',
     features: ['Centrifusion Extraction Technology', 'Single Touch Brewing', 'Fast 20-sec heatup'],
     pros: ['Rich crema layer on coffee', 'Quiet operation', 'Compact swivel water tank'],
     cons: ['Requires Nespresso Vertuo pods'],
+    isFeatured: false,
+    isDeal: true,
   },
 
-  // Beauty & Personal Care
+  // 3. Beauty & Personal Care
   {
-    name: 'COSRX Snail Mucin 96% Power Repairing Essence Serum',
-    cat: 'beauty',
+    title: 'COSRX Snail Mucin 96% Power Repairing Essence Serum',
+    slug: 'cosrx-snail-mucin-96-power-essence',
+    categorySlug: 'beauty',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B00PBX3L7K?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800',
     price: 14.99,
-    origPrice: 25.00,
+    originalPrice: 25.00,
     rating: 4.7,
-    reviews: 89400,
-    img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800',
-    desc: 'Formulated with 96.3% Snail Secretion Filtrate to repair and revitalize skin from dryness and aging.',
+    reviewCount: 89400,
+    shortDescription: 'Formulated with 96.3% Snail Secretion Filtrate to repair and revitalize skin from dryness and aging.',
+    description: 'Formulated with 96.3% Snail Secretion Filtrate to repair and revitalize skin. Delivers deep hydration and improves skin elasticity.',
     features: ['96.3% Snail Secretion Filtrate', 'Deep Hydration & Repair', 'Dermatologist Tested'],
     pros: ['Gives instant glass-skin glow', 'Super lightweight formula', 'Hypoallergenic'],
     cons: ['Slimy texture initial application'],
+    isFeatured: false,
+    isDeal: true,
   },
   {
-    name: 'Philips Norelco Multigroomer All-in-One Trimmer Series 7000',
-    cat: 'beauty',
+    title: 'Philips Norelco Multigroomer All-in-One Trimmer Series 7000',
+    slug: 'philips-norelco-multigroomer-series-7000',
+    categorySlug: 'beauty',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B07145GM4B?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
     price: 59.96,
-    origPrice: 69.99,
+    originalPrice: 69.99,
     rating: 4.7,
-    reviews: 78500,
-    img: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
-    desc: 'All-in-one trimmer for beard, hair, body, and face trimming with 19 quality attachments.',
+    reviewCount: 78500,
+    shortDescription: 'All-in-one trimmer for beard, hair, body, and face trimming with 19 quality attachments.',
+    description: 'All-in-one trimmer for beard, hair, body, and face trimming. Features DualCut self-sharpening blades and 5-hour lithium ion battery.',
     features: ['DualCut Self-Sharpening Blades', '5 Hour Lithium Battery', 'Fully Washable Design'],
     pros: ['Extremely sharp durable blades', 'Incredible battery life', 'Versatile guard options'],
     cons: ['No dedicated storage case included'],
+    isFeatured: true,
+    isDeal: false,
   },
 
-  // Fitness & Sports
+  // 4. Fitness & Sports
   {
-    name: 'Fitbit Charge 6 Fitness Tracker with GPS & ECG',
-    cat: 'fitness',
+    title: 'Fitbit Charge 6 Fitness Tracker with GPS & ECG',
+    slug: 'fitbit-charge-6-fitness-tracker-gps',
+    categorySlug: 'fitness',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B0CG617ZCR?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800',
     price: 139.95,
-    origPrice: 159.95,
+    originalPrice: 159.95,
     rating: 4.5,
-    reviews: 19400,
-    img: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800',
-    desc: 'Advanced fitness band featuring built-in GPS, YouTube music controls, and 40+ workout modes.',
+    reviewCount: 19400,
+    shortDescription: 'Advanced fitness band featuring built-in GPS, YouTube music controls, and 40+ workout modes.',
+    description: 'Advanced fitness band featuring built-in GPS, YouTube music controls, Google Maps navigation, and 40+ exercise modes.',
     features: ['Built-in GPS & ECG Sensor', 'Google Maps Navigation', '7 Day Battery Life'],
     pros: ['Sleek comfortable design', 'Accurate heart rate tracking', 'Google ecosystem integration'],
     cons: ['Screen size small for long texts'],
+    isFeatured: true,
+    isDeal: true,
   },
   {
-    name: 'Bowflex SelectTech 552 Adjustable Dumbbells Pair',
-    cat: 'fitness',
+    title: 'Bowflex SelectTech 552 Adjustable Dumbbells Pair',
+    slug: 'bowflex-selecttech-552-adjustable-dumbbells',
+    categorySlug: 'fitness',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B001ARYU58?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800',
     price: 429.00,
-    origPrice: 549.00,
+    originalPrice: 549.00,
     rating: 4.8,
-    reviews: 38900,
-    img: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800',
-    desc: 'Adjusts from 5 to 52.5 lbs in 2.5 lb increments, replacing 15 sets of weights in one compact pair.',
+    reviewCount: 38900,
+    shortDescription: 'Adjusts from 5 to 52.5 lbs in 2.5 lb increments, replacing 15 sets of weights in one compact pair.',
+    description: 'Adjusts from 5 to 52.5 lbs in 2.5 lb increments, replacing 15 sets of weights in one compact pair for home gym strength training.',
     features: ['Adjusts 5 to 52.5 lbs per dumbbell', 'Smooth dial weight selection', 'Durable molding'],
     pros: ['Saves massive home gym space', 'Fast dial adjustment', 'High durability'],
     cons: ['Bulky frame for small exercises'],
+    isFeatured: false,
+    isDeal: true,
   },
 
-  // Tech Gadgets
+  // 5. Tech Gadgets
   {
-    name: 'Roku Express 4K+ HD Streaming Media Player',
-    cat: 'tech-gadgets',
+    title: 'Roku Express 4K+ HD Streaming Media Player',
+    slug: 'roku-express-4k-plus-media-player',
+    categorySlug: 'tech-gadgets',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B09BKCDXZC?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800',
     price: 39.99,
-    origPrice: 49.99,
+    originalPrice: 49.99,
     rating: 4.7,
-    reviews: 95100,
-    img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800',
-    desc: 'Brilliant 4K picture quality and smooth wireless streaming performance with voice remote.',
+    reviewCount: 95100,
+    shortDescription: 'Brilliant 4K picture quality and smooth wireless streaming performance with voice remote.',
+    description: 'Brilliant 4K picture quality and smooth wireless streaming performance with voice remote that controls your TV power and volume.',
     features: ['4K / HDR Picture Quality', 'Voice Remote with TV Controls', 'Simple Setup'],
     pros: ['Ultra fast UI', 'Great channel variety', 'Compact hideaway design'],
     cons: ['Needs direct line of sight remote'],
+    isFeatured: true,
+    isDeal: true,
   },
   {
-    name: 'Kasa Smart Plug Mini Wi-Fi Outlet by TP-Link (4 Pack)',
-    cat: 'tech-gadgets',
+    title: 'Kasa Smart Plug Mini Wi-Fi Outlet by TP-Link (4 Pack)',
+    slug: 'kasa-smart-plug-mini-wifi-outlet-4pack',
+    categorySlug: 'tech-gadgets',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B07RCN325X?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=800',
     price: 29.99,
-    origPrice: 34.99,
+    originalPrice: 34.99,
     rating: 4.6,
-    reviews: 145000,
-    img: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=800',
-    desc: 'Control lamps, fans, and appliances from anywhere with the Kasa app or hands-free voice control.',
+    reviewCount: 145000,
+    shortDescription: 'Control lamps, fans, and appliances from anywhere with the Kasa app or hands-free voice control.',
+    description: 'Control lamps, fans, and appliances from anywhere with the Kasa app or hands-free voice control using Alexa or Google Assistant.',
     features: ['Alexa & Google Assistant Compatible', 'Scheduling & Timer Features', 'No Hub Required'],
     pros: ['Super simple app setup', 'Reliable Wi-Fi connection', 'Compact design doesn\'t block second outlet'],
     cons: ['2.4GHz Wi-Fi band required'],
+    isFeatured: false,
+    isDeal: true,
   },
 
-  // Fashion & Apparel
+  // 6. Fashion & Apparel
   {
-    name: 'Oakley Gascan Rectangular Sunglasses Matte Black',
-    cat: 'fashion',
+    title: 'Oakley Gascan Rectangular Sunglasses Matte Black',
+    slug: 'oakley-gascan-rectangular-sunglasses-matte-black',
+    categorySlug: 'fashion',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B000O56DSE?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800',
     price: 122.00,
-    origPrice: 142.00,
+    originalPrice: 142.00,
     rating: 4.7,
-    reviews: 21900,
-    img: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800',
-    desc: 'Plutonite lenses offer 100% UV Protection filtering of all UVA, UVB, UVC and harmful blue light.',
+    reviewCount: 21900,
+    shortDescription: 'Plutonite lenses offer 100% UV Protection filtering of all UVA, UVB, UVC and harmful blue light.',
+    description: 'Plutonite lenses offer 100% UV Protection filtering of all UVA, UVB, UVC and harmful blue light with O Matter stress-resistant frames.',
     features: ['Plutonite 100% UV Lenses', 'O Matter Stress-Resistant Frame', 'Three-Point Fit Alignment'],
     pros: ['Lightweight impact resistant frame', 'Aggressive sleek wrap style', 'Clarity optic lenses'],
     cons: ['Non-polarized base version'],
+    isFeatured: false,
+    isDeal: false,
   },
 
-  // Toys & Games
+  // 7. Toys & Games
   {
-    name: 'Catan Board Game (Base Game) 3-4 Players',
-    cat: 'toys-games',
+    title: 'Catan Board Game (Base Game) 3-4 Players',
+    slug: 'catan-board-game-base-game',
+    categorySlug: 'toys-games',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B00U26V4VQ?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800',
     price: 44.97,
-    origPrice: 55.00,
+    originalPrice: 55.00,
     rating: 4.8,
-    reviews: 58000,
-    img: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800',
-    desc: 'Picture yourself in the era of discovery: after a long voyage of deprivation, your ships have reached the coast of an uncharted island.',
+    reviewCount: 58000,
+    shortDescription: 'Picture yourself in the era of discovery: after a long voyage of deprivation, your ships have reached the coast of an uncharted island.',
+    description: 'Picture yourself in the era of discovery: after a long voyage of deprivation, your ships have reached the coast of an uncharted island. Build roads, settlements and cities.',
     features: ['3 to 4 Players', '60 Minute Gameplay', 'Endless Replayability'],
     pros: ['Engaging strategy game', 'Variable board layout every game', 'Fun for family and friends'],
     cons: ['Requires learning curve for new players'],
+    isFeatured: true,
+    isDeal: false,
   },
 
-  // Pet Supplies
+  // 8. Pet Supplies
   {
-    name: 'Veken Pet Water Fountain 95oz Stainless Steel for Cats & Dogs',
-    cat: 'pet-supplies',
+    title: 'Veken Pet Water Fountain 95oz Stainless Steel for Cats & Dogs',
+    slug: 'veken-pet-water-fountain-stainless-steel-95oz',
+    categorySlug: 'pet-supplies',
+    amazonAffiliateUrl: 'https://www.amazon.com/dp/B085CD7YLM?tag=amzfinds063-20',
+    imageUrl: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=800',
     price: 26.99,
-    origPrice: 32.99,
+    originalPrice: 32.99,
     rating: 4.6,
-    reviews: 64100,
-    img: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=800',
-    desc: 'Ultra quiet automatic water dispenser with triple filtration system to keep pet water fresh.',
+    reviewCount: 64100,
+    shortDescription: 'Ultra quiet automatic water dispenser with triple filtration system to keep pet water fresh.',
+    description: 'Ultra quiet automatic water dispenser with triple filtration system to keep pet water fresh and flowing continuously for cats and dogs.',
     features: ['95oz / 2.8L Large Capacity', 'Triple Filtration System', 'Ultra Quiet Pump'],
     pros: ['Encourages pets to drink more water', 'Whisper quiet pump', 'Easy to disassemble and clean'],
     cons: ['Filters require monthly replacement'],
+    isFeatured: false,
+    isDeal: true,
   },
 ]
 
@@ -235,10 +319,10 @@ export async function POST(req: Request) {
 
     // 3. Find items from master library that haven't been added yet
     const unaddedFromLibrary = MULTI_CATEGORY_MASTER_LIBRARY.filter(
-      (item) => !existingSlugs.has(item.slug) && !existingUrls.has(item.amazonAffiliateUrl)
+      (item) => item.slug && item.amazonAffiliateUrl && !existingSlugs.has(item.slug) && !existingUrls.has(item.amazonAffiliateUrl)
     )
 
-    let itemsToAdd: any[] = []
+    let itemsToAdd: MasterProduct[] = []
 
     if (unaddedFromLibrary.length >= 5) {
       itemsToAdd = unaddedFromLibrary.slice(0, 5)
@@ -302,19 +386,22 @@ export async function POST(req: Request) {
         const uniqueAsin = `B0AMZ${batchId}${i + 1}`
 
         itemsToAdd.push({
-          name: `${tpl.baseName} (${catSlug.toUpperCase()} Find #${batchId}${i + 1})`,
+          title: `${tpl.baseName} (${catSlug.toUpperCase()} Find #${batchId}${i + 1})`,
           slug: uniqueSlug,
-          cat: catSlug,
+          categorySlug: catSlug,
           amazonAffiliateUrl: `https://www.amazon.com/dp/${uniqueAsin}?tag=amzfinds063-20`,
-          img: tpl.img,
+          imageUrl: tpl.img,
           price: tpl.price,
-          origPrice: tpl.origPrice,
+          originalPrice: tpl.origPrice,
           rating: tpl.rating,
-          reviews: tpl.reviews + (i * 240),
-          desc: `Premium top-rated product in ${catSlug}. Offers incredible performance, stylish design, and verified customer satisfaction.`,
+          reviewCount: tpl.reviews + (i * 240),
+          shortDescription: `Top-rated USA product in ${catSlug}. High customer ratings and verified Amazon quality.`,
+          description: `Discover this top-rated Amazon product in ${catSlug}. Features premium build quality, outstanding user reviews, and excellent value for money.`,
           features: ['Top Rated Amazon Recommendation', '100% Quality Verified', 'Fast USA Amazon Shipping'],
           pros: ['Exceptional performance & build', 'High customer review score', 'Great overall value'],
           cons: ['High demand product with limited stock'],
+          isFeatured: i % 2 === 0,
+          isDeal: true,
         })
       }
     }
@@ -323,30 +410,32 @@ export async function POST(req: Request) {
     let addedCount = 0
 
     for (const item of itemsToAdd) {
-      const categoryId = categoryMap[item.cat] || Object.values(categoryMap)[0] || categories[0]?.id
+      if (!item.title || !item.slug) continue
+
+      const categoryId = categoryMap[item.categorySlug] || Object.values(categoryMap)[0] || categories[0]?.id
       if (!categoryId) continue
 
       await prisma.product.create({
         data: {
-          title: item.name,
+          title: item.title,
           slug: item.slug,
           categoryId,
           amazonAffiliateUrl: item.amazonAffiliateUrl || `https://www.amazon.com/dp/${item.slug}?tag=amzfinds063-20`,
-          imageUrl: item.img,
+          imageUrl: item.imageUrl,
           price: item.price,
-          originalPrice: item.origPrice,
+          originalPrice: item.originalPrice || null,
           rating: item.rating,
-          reviewCount: item.reviews,
-          shortDescription: item.desc.slice(0, 160),
-          description: item.desc,
+          reviewCount: item.reviewCount,
+          shortDescription: item.shortDescription.slice(0, 160),
+          description: item.description,
           features: JSON.stringify(item.features || []),
           pros: JSON.stringify(item.pros || []),
           cons: JSON.stringify(item.cons || []),
-          isFeatured: addedCount % 2 === 0,
-          isDeal: true,
+          isFeatured: Boolean(item.isFeatured),
+          isDeal: Boolean(item.isDeal),
           isActive: true,
-          seoTitle: `${item.name} - Amazon Review & Best Deals`,
-          seoDescription: item.desc.slice(0, 160),
+          seoTitle: `${item.title} - Amazon Review & Best Deals`,
+          seoDescription: item.shortDescription.slice(0, 160),
         },
       })
       addedCount++

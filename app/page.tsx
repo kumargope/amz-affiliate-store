@@ -35,6 +35,12 @@ export default async function HomePage() {
       include: { category: { select: { name: true, slug: true } } },
       orderBy: [{ rating: 'desc' }, { updatedAt: 'desc' }],
     })
+
+    var allProducts = await prisma.product.findMany({
+      where: { isActive: true },
+      include: { category: { select: { name: true, slug: true } } },
+      orderBy: { createdAt: 'desc' },
+    })
   } catch (e) {
     console.error('Database fetch error on HomePage:', e)
   }
@@ -106,40 +112,40 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 6. Why Shop Through Us Section */}
-      <WhyShopUs />
-
-      {/* 7. Popular Products Section */}
-      {popularProducts.length > 0 && (
+      {/* 6. Full Storefront Showcase Section - Display ALL Products */}
+      {allProducts.length > 0 && (
         <section className="py-16 bg-white border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-100/80 px-2.5 py-1 rounded-full mb-2">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Most Viewed Finds</span>
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-full mb-2">
+                  <Trophy className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>All Storefront Products ({allProducts.length})</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                  Popular Recommendations
+                  Explore All Amazon USA Finds
                 </h2>
               </div>
               <Link
                 href="/search"
                 className="inline-flex items-center gap-1 text-sm font-bold text-amber-600 hover:text-amber-700"
               >
-                <span>Explore Full Storefront</span>
+                <span>Search & Filter</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {popularProducts.map((product) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {allProducts.map((product) => (
                 <ProductCard key={product.id} {...product} />
               ))}
             </div>
           </div>
         </section>
       )}
+
+      {/* 7. Why Shop Through Us Section */}
+      <WhyShopUs />
     </div>
   )
 }

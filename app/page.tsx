@@ -14,6 +14,7 @@ export default async function HomePage() {
   let categories: any[] = []
   let trendingProducts: any[] = []
   let popularProducts: any[] = []
+  let allProducts: any[] = []
 
   try {
     categories = await prisma.category.findMany({
@@ -36,7 +37,7 @@ export default async function HomePage() {
       orderBy: [{ rating: 'desc' }, { updatedAt: 'desc' }],
     })
 
-    var allProducts = await prisma.product.findMany({
+    allProducts = await prisma.product.findMany({
       where: { isActive: true },
       include: { category: { select: { name: true, slug: true } } },
       orderBy: { createdAt: 'desc' },

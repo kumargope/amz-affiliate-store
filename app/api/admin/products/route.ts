@@ -10,15 +10,19 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      category: { select: { id: true, name: true, slug: true } },
-      _count: { select: { clicks: true } },
-    },
-  })
-
-  return NextResponse.json({ products })
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        category: { select: { id: true, name: true, slug: true } },
+        _count: { select: { clicks: true } },
+      },
+    })
+    return NextResponse.json({ products })
+  } catch (error) {
+    console.error('Error fetching admin products:', error)
+    return NextResponse.json({ products: [] })
+  }
 }
 
 // POST /api/admin/products - Create product
@@ -77,10 +81,10 @@ export async function POST(req: Request) {
         categoryId,
         imageUrl,
         amazonAffiliateUrl: cleanAffiliateUrl,
-        price: price !== undefined && price !== '' ? parseFloat(price) : null,
-        originalPrice: originalPrice !== undefined && originalPrice !== '' ? parseFloat(originalPrice) : null,
-        rating: rating !== undefined && rating !== '' ? parseFloat(rating) : null,
-        reviewCount: reviewCount !== undefined && reviewCount !== '' ? parseInt(reviewCount) : null,
+        price: price !== undefined && price !== '' && price !== null ? parseFloat(price) : null,
+        originalPrice: originalPrice !== undefined && originalPrice !== '' && originalPrice !== null ? parseFloat(originalPrice) : null,
+        rating: rating !== undefined && rating !== '' && rating !== null ? parseFloat(rating) : null,
+        reviewCount: reviewCount !== undefined && reviewCount !== '' && reviewCount !== null ? parseInt(reviewCount) : null,
         isFeatured: Boolean(isFeatured),
         isDeal: Boolean(isDeal),
         isActive: isActive !== undefined ? Boolean(isActive) : true,

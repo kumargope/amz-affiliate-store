@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?
+  order       Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id                 String   @id @default(uuid())
+  title              String
+  slug               String   @unique
+  description        String
+  shortDescription   String
+  features           String   // Stored as JSON or newline list
+  pros               String?  // Stored as JSON or newline list
+  cons               String?  // Stored as JSON or newline list
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+  imageUrl           String
+  amazonAffiliateUrl String
+  price              Float?
+  currency           String   @default("USD")
+  rating             Float?
+  reviewCount        Int?
+  isFeatured         Boolean  @default(false)
+  isDeal             Boolean  @default(false)
+  originalPrice      Float?   // Real discount base price if available
+  isActive           Boolean  @default(true)
+  seoTitle           String?
+  seoDescription     String?
+  clicks             Click[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Click {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  key   String @id
+  value String
+}

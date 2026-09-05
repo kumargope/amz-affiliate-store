@@ -33,7 +33,7 @@ export default async function HomePage() {
       where: { isActive: true },
       take: 8,
       include: { category: { select: { name: true, slug: true } } },
-      orderBy: { clicks: { _count: 'desc' } },
+      orderBy: [{ rating: 'desc' }, { updatedAt: 'desc' }],
     })
   } catch (e) {
     console.error('Database fetch error on HomePage:', e)

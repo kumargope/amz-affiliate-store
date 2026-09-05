@@ -9,11 +9,16 @@ export const metadata: Metadata = {
 }
 
 export default async function GiftFinderPage() {
-  const products = await prisma.product.findMany({
-    where: { isActive: true },
-    include: { category: { select: { name: true, slug: true } } },
-    orderBy: { rating: 'desc' },
-  })
+  let products: any[] = []
+  try {
+    products = await prisma.product.findMany({
+      where: { isActive: true },
+      include: { category: { select: { name: true, slug: true } } },
+      orderBy: { rating: 'desc' },
+    })
+  } catch (error) {
+    console.error('Error fetching gift finder products:', error)
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-10">

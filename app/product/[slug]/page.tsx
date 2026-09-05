@@ -16,42 +16,65 @@ interface ProductPageProps {
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
-    include: { category: true },
-  })
+  try {
+    const product = await prisma.product.findUnique({
+      where: { slug: params.slug },
+      include: { category: true },
+    })
 
-  if (!product) {
-    return { title: 'Product Not Found' }
-  }
+    if (!product) {
+      return { title: 'Product Not Found' }
+    }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  const title = product.seoTitle || `${product.title} - Amazon Affiliate Review & Deals`
-  const description = product.seoDescription || product.shortDescription
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const title = product.seoTitle || `${product.title} - Amazon Affiliate Review & Deals`
+    const description = product.seoDescription || product.shortDescription
 
-  return {
-    title,
-    description,
-    openGraph: {
+    return {
       title,
       description,
-      url: `${siteUrl}/product/${product.slug}`,
-      images: [{ url: product.imageUrl, alt: product.title }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [product.imageUrl],
-    },
+      openGraph: {
+        title,
+        description,
+        url: `${siteUrl}/product/${product.slug}`,
+        images: [{ url: product.imageUrl, alt: product.title }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [product.imageUrl],
+      },
+    }
+  } catch {
+    return { title: 'Amazon Product | AmzFinds' }
   }
 }
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug, isActive: true },
-    include: { category: true },
-  })
+  let product: any = null
+  let relatedProducts: any[] = []
+
+  try {
+    product = await prisma.product.findUnique({
+      where: { slug: params.slug, isActive: true },
+      include: { category: true },
+    })
+
+    if (product) {
+      relatedProducts = await prisma.product.findMany({
+        where: {
+          categoryId: product.categoryId,
+          id: { not: product.id },
+          isActive: true,
+        },
+        take: 4,
+        include: { category: { select: { name: true, slug: true } } },
+      })
+    }
+  } catch (error) {
+    console.error('Error in ProductDetailPage:', error)
+  }
 
   if (!product) {
     notFound()
@@ -79,17 +102,6 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   } catch {
     cons = product.cons ? product.cons.split('\n').filter(Boolean) : []
   }
-
-  // Related products from same category
-  const relatedProducts = await prisma.product.findMany({
-    where: {
-      categoryId: product.categoryId,
-      id: { not: product.id },
-      isActive: true,
-    },
-    take: 4,
-    include: { category: { select: { name: true, slug: true } } },
-  })
 
   const currencySymbol = product.currency === 'USD' ? '$' : '$'
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'

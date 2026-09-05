@@ -16,42 +16,55 @@ interface CategoryPageProps {
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const category = await prisma.category.findUnique({
-    where: { slug: params.slug },
-  })
+  try {
+    const category = await prisma.category.findUnique({
+      where: { slug: params.slug },
+    })
 
-  if (!category) return { title: 'Category Not Found' }
+    if (!category) return { title: 'Category Not Found' }
 
-  const title = `Best ${category.name} Products & Deals | AmzFinds`
-  const description = category.description || `Browse top-rated Amazon products in ${category.name}. Hand-picked affiliate recommendations.`
+    const title = `Best ${category.name} Products & Deals | AmzFinds`
+    const description = category.description || `Browse top-rated Amazon products in ${category.name}. Hand-picked affiliate recommendations.`
 
-  return {
-    title,
-    description,
-    openGraph: {
+    return {
       title,
       description,
-    },
+      openGraph: {
+        title,
+        description,
+      },
+    }
+  } catch {
+    return { title: 'Category | AmzFinds' }
   }
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
-  const category = await prisma.category.findUnique({
-    where: { slug: params.slug },
-  })
+  let category: any = null
+  let products: any[] = []
+
+  try {
+    category = await prisma.category.findUnique({
+      where: { slug: params.slug },
+    })
+
+    if (category) {
+      let orderBy: any = { updatedAt: 'desc' }
+      if (searchParams.sort === 'price-asc') orderBy = { price: 'asc' }
+      if (searchParams.sort === 'price-desc') orderBy = { price: 'desc' }
+      if (searchParams.sort === 'rating') orderBy = { rating: 'desc' }
+
+      products = await prisma.product.findMany({
+        where: { categoryId: category.id, isActive: true },
+        orderBy,
+        include: { category: { select: { name: true, slug: true } } },
+      })
+    }
+  } catch (error) {
+    console.error('Error in CategoryPage:', error)
+  }
 
   if (!category) notFound()
-
-  let orderBy: any = { updatedAt: 'desc' }
-  if (searchParams.sort === 'price-asc') orderBy = { price: 'asc' }
-  if (searchParams.sort === 'price-desc') orderBy = { price: 'desc' }
-  if (searchParams.sort === 'rating') orderBy = { rating: 'desc' }
-
-  const products = await prisma.product.findMany({
-    where: { categoryId: category.id, isActive: true },
-    orderBy,
-    include: { category: { select: { name: true, slug: true } } },
-  })
 
   return (
     <div className="bg-slate-50 min-h-screen py-8">

@@ -25,48 +25,55 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const sort = searchParams.sort || 'newest'
   const featuredOnly = searchParams.featured === 'true'
 
-  // Fetch categories for filter dropdown
-  const categories = await prisma.category.findMany({
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true, slug: true },
-  })
+  let categories: any[] = []
+  let products: any[] = []
 
-  // Build filter conditions
-  const where: any = {
-    isActive: true,
-  }
+  try {
+    // Fetch categories for filter dropdown
+    categories = await prisma.category.findMany({
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, slug: true },
+    })
 
-  if (query) {
-    where.OR = [
-      { title: { contains: query } },
-      { description: { contains: query } },
-      { shortDescription: { contains: query } },
-    ]
-  }
-
-  if (categorySlug) {
-    const selectedCat = categories.find((c) => c.slug === categorySlug)
-    if (selectedCat) {
-      where.categoryId = selectedCat.id
+    // Build filter conditions
+    const where: any = {
+      isActive: true,
     }
+
+    if (query) {
+      where.OR = [
+        { title: { contains: query } },
+        { description: { contains: query } },
+        { shortDescription: { contains: query } },
+      ]
+    }
+
+    if (categorySlug) {
+      const selectedCat = categories.find((c) => c.slug === categorySlug)
+      if (selectedCat) {
+        where.categoryId = selectedCat.id
+      }
+    }
+
+    if (featuredOnly) {
+      where.isFeatured = true
+    }
+
+    // Build sorting condition
+    let orderBy: any = { updatedAt: 'desc' }
+    if (sort === 'popular') orderBy = [{ rating: 'desc' }, { updatedAt: 'desc' }]
+    if (sort === 'price-asc') orderBy = { price: 'asc' }
+    if (sort === 'price-desc') orderBy = { price: 'desc' }
+    if (sort === 'rating') orderBy = { rating: 'desc' }
+
+    products = await prisma.product.findMany({
+      where,
+      orderBy,
+      include: { category: { select: { name: true, slug: true } } },
+    })
+  } catch (error) {
+    console.error('Error fetching search page products:', error)
   }
-
-  if (featuredOnly) {
-    where.isFeatured = true
-  }
-
-  // Build sorting condition
-  let orderBy: any = { updatedAt: 'desc' }
-  if (sort === 'popular') orderBy = { clicks: { _count: 'desc' } }
-  if (sort === 'price-asc') orderBy = { price: 'asc' }
-  if (sort === 'price-desc') orderBy = { price: 'desc' }
-  if (sort === 'rating') orderBy = { rating: 'desc' }
-
-  const products = await prisma.product.findMany({
-    where,
-    orderBy,
-    include: { category: { select: { name: true, slug: true } } },
-  })
 
   return (
     <div className="bg-slate-50 min-h-screen py-8">

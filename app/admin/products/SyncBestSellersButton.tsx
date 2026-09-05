@@ -1,9 +1,11 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Sparkles, Check, RefreshCw } from 'lucide-react'
 
 export default function SyncBestSellersButton() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -27,9 +29,10 @@ export default function SyncBestSellersButton() {
       }
 
       setMessage(data.message)
+      router.refresh()
       setTimeout(() => {
-        window.location.reload()
-      }, 1500)
+        window.location.href = '/admin/products'
+      }, 1200)
     } catch {
       setError('An error occurred during auto-sync')
       setLoading(false)

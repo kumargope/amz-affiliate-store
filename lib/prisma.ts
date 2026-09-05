@@ -3,13 +3,14 @@ import fs from 'fs'
 import path from 'path'
 
 function prepareWritableDatabase() {
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+  if (process.env.VERCEL) {
     try {
       const tmpDbPath = '/tmp/dev.db'
       const bundledDbPath = path.join(process.cwd(), 'prisma', 'dev.db')
 
       if (!fs.existsSync(tmpDbPath)) {
         if (fs.existsSync(bundledDbPath)) {
+          fs.mkdirSync(path.dirname(tmpDbPath), { recursive: true })
           fs.copyFileSync(bundledDbPath, tmpDbPath)
         }
       }

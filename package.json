@@ -11,7 +11,6 @@
     "db:seed": "node --loader ts-node/register scripts/seed.ts"
   },
   "dependencies": {
-    "@next/swc-win32-x64-msvc": "^16.3.4",
     "@prisma/client": "^5.21.1",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",

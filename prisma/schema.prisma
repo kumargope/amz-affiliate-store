@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -32,9 +33,9 @@ model Product {
   slug               String   @unique
   description        String
   shortDescription   String
-  features           String   // Stored as JSON or newline list
-  pros               String?  // Stored as JSON or newline list
-  cons               String?  // Stored as JSON or newline list
+  features           String
+  pros               String?
+  cons               String?
   categoryId         String
   category           Category @relation(fields: [categoryId], references: [id])
   imageUrl           String
@@ -45,7 +46,7 @@ model Product {
   reviewCount        Int?
   isFeatured         Boolean  @default(false)
   isDeal             Boolean  @default(false)
-  originalPrice      Float?   // Real discount base price if available
+  originalPrice      Float?
   isActive           Boolean  @default(true)
   seoTitle           String?
   seoDescription     String?

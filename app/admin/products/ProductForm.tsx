@@ -174,12 +174,18 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
                   onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
+                  <option value="">-- Select Category --</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
                   ))}
                 </select>
+                {categories.length === 0 && (
+                  <p className="text-[11px] text-amber-600 mt-1">
+                    No categories found. Please refresh or create a category in Admin.
+                  </p>
+                )}
               </div>
             </div>
 

@@ -3,11 +3,21 @@ import { prisma } from '@/lib/prisma'
 import { getAdminFromCookie } from '@/lib/auth'
 
 export async function GET() {
-  const categories = await prisma.category.findMany({
-    orderBy: { order: 'asc' },
-    include: { _count: { select: { products: true } } },
-  })
-  return NextResponse.json({ categories })
+  try {
+    const rawCategories = await prisma.category.findMany({
+      orderBy: { order: 'asc' },
+      include: { products: { select: { id: true } } },
+    })
+
+    const categories = rawCategories.map((cat) => ({
+      ...cat,
+      _count: { products: cat.products ? cat.products.length : 0 },
+    }))
+
+    return NextResponse.json({ categories })
+  } catch (error) {
+    return NextResponse.json({ categories: [] })
+  }
 }
 
 export async function POST(req: Request) {
@@ -24,8 +34,15 @@ export async function POST(req: Request) {
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
 
-    const category = await prisma.category.create({
-      data: {
+    const category = await prisma.category.upsert({
+      where: { slug: formattedSlug },
+      update: {
+        name,
+        description,
+        icon,
+        order: order ? parseInt(order) : 0,
+      },
+      create: {
         name,
         slug: formattedSlug,
         description,
@@ -36,6 +53,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, category })
   } catch (error) {
+    console.error('Error creating category:', error)
     return NextResponse.json({ error: 'Failed to create category' }, { status: 500 })
   }
 }

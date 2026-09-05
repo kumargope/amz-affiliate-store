@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Image as ImageIcon, Link as LinkIcon, Sparkles } from 'lucide-react'
 
@@ -19,6 +19,22 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [categoriesList, setCategoriesList] = useState<Category[]>(categories)
+
+  useEffect(() => {
+    fetch('/api/admin/categories')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.categories && data.categories.length > 0) {
+          setCategoriesList(data.categories)
+          setFormData((prev) => ({
+            ...prev,
+            categoryId: prev.categoryId || data.categories[0].id,
+          }))
+        }
+      })
+      .catch((err) => console.error('Failed to fetch categories dynamically:', err))
+  }, [])
 
   const parseArrayField = (field: any) => {
     if (!field) return ''
@@ -175,15 +191,15 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
                   <option value="">-- Select Category --</option>
-                  {categories.map((c) => (
+                  {categoriesList.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
                   ))}
                 </select>
-                {categories.length === 0 && (
+                {categoriesList.length === 0 && (
                   <p className="text-[11px] text-amber-600 mt-1">
-                    No categories found. Please refresh or create a category in Admin.
+                    Loading categories or no categories found.
                   </p>
                 )}
               </div>

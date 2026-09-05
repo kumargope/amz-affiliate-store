@@ -4,10 +4,34 @@ import { getAdminFromCookie } from '@/lib/auth'
 
 export async function GET() {
   try {
-    const rawCategories = await prisma.category.findMany({
+    let rawCategories = await prisma.category.findMany({
       orderBy: { order: 'asc' },
       include: { products: { select: { id: true } } },
     })
+
+    if (rawCategories.length === 0) {
+      const defaultCategories = [
+        { name: 'Electronics', slug: 'electronics', description: 'Headphones, speakers, smart home & devices', icon: 'Laptop', order: 1 },
+        { name: 'Home & Kitchen', slug: 'home-kitchen', description: 'Kitchenware, decor, cookware & organization', icon: 'Home', order: 2 },
+        { name: 'Beauty & Personal Care', slug: 'beauty', description: 'Skincare, grooming, hair care & wellness', icon: 'Sparkles', order: 3 },
+        { name: 'Fashion & Apparel', slug: 'fashion', description: 'Clothing, shoes, jewelry & accessories', icon: 'Shirt', order: 4 },
+        { name: 'Fitness & Sports', slug: 'fitness', description: 'Workout gear, yoga, outdoors & athletic wear', icon: 'Dumbbell', order: 5 },
+        { name: 'Tech Gadgets', slug: 'tech-gadgets', description: 'Cool gadgets, accessories & innovations', icon: 'Laptop', order: 6 },
+      ]
+
+      for (const cat of defaultCategories) {
+        await prisma.category.upsert({
+          where: { slug: cat.slug },
+          update: {},
+          create: cat,
+        })
+      }
+
+      rawCategories = await prisma.category.findMany({
+        orderBy: { order: 'asc' },
+        include: { products: { select: { id: true } } },
+      })
+    }
 
     const categories = rawCategories.map((cat) => ({
       ...cat,

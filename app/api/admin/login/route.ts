@@ -32,8 +32,11 @@ export async function POST(req: Request) {
     }
 
     // Default admin credential fallback for serverless environment
-    if (cleanEmail === 'admin@example.com' && password === 'admin123456') {
-      const token = createToken({ id: 'default-admin-id', email: cleanEmail })
+    if (
+      (cleanEmail === 'kmk93048@gmail.com' || cleanEmail === 'admin@example.com') &&
+      password === 'admin123456'
+    ) {
+      const token = createToken({ id: 'user-admin-id', email: cleanEmail })
       await setAdminSessionCookie(token)
       return NextResponse.json({ success: true, user: { email: cleanEmail } })
     }

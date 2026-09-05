@@ -10,11 +10,17 @@ export const metadata: Metadata = {
 }
 
 export default async function DealsPage() {
-  const dealProducts = await prisma.product.findMany({
-    where: { isActive: true, isDeal: true },
-    include: { category: { select: { name: true, slug: true } } },
-    orderBy: { updatedAt: 'desc' },
-  })
+  let dealProducts: any[] = []
+
+  try {
+    dealProducts = await prisma.product.findMany({
+      where: { isActive: true, isDeal: true },
+      include: { category: { select: { name: true, slug: true } } },
+      orderBy: { updatedAt: 'desc' },
+    })
+  } catch (error) {
+    console.error('Error fetching deals page products:', error)
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-10">

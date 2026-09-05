@@ -10,13 +10,19 @@ export default async function AdminProductsPage() {
   const admin = await getAdminFromCookie()
   if (!admin) redirect('/admin/login')
 
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      category: { select: { name: true } },
-      _count: { select: { clicks: true } },
-    },
-  })
+  let products: any[] = []
+
+  try {
+    products = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        category: { select: { name: true } },
+        _count: { select: { clicks: true } },
+      },
+    })
+  } catch (error) {
+    console.error('Error fetching products for admin products page:', error)
+  }
 
   return (
     <div className="space-y-6">
@@ -71,9 +77,9 @@ export default async function AdminProductsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-slate-600 font-medium">{p.category.name}</td>
+                  <td className="p-4 text-slate-600 font-medium">{p.category?.name || 'N/A'}</td>
                   <td className="p-4 font-bold text-slate-900">
-                    {p.price !== null ? `$${p.price.toFixed(2)}` : 'N/A'}
+                    {p.price !== null && p.price !== undefined ? `$${p.price.toFixed(2)}` : 'N/A'}
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-1.5">
@@ -89,7 +95,7 @@ export default async function AdminProductsPage() {
                       )}
                     </div>
                   </td>
-                  <td className="p-4 font-bold text-slate-700">{p._count.clicks}</td>
+                  <td className="p-4 font-bold text-slate-700">{p._count?.clicks || 0}</td>
                   <td className="p-4">
                     {p.isActive ? (
                       <span className="inline-flex items-center gap-1 text-emerald-700 text-xs font-bold bg-emerald-50 px-2 py-0.5 rounded-md">

@@ -8,10 +8,16 @@ export default async function AdminCategoriesPage() {
   const admin = await getAdminFromCookie()
   if (!admin) redirect('/admin/login')
 
-  const categories = await prisma.category.findMany({
-    orderBy: { order: 'asc' },
-    include: { _count: { select: { products: true } } },
-  })
+  let categories: any[] = []
+
+  try {
+    categories = await prisma.category.findMany({
+      orderBy: { order: 'asc' },
+      include: { _count: { select: { products: true } } },
+    })
+  } catch (error) {
+    console.error('Error fetching categories for admin categories page:', error)
+  }
 
   return <CategoryManager initialCategories={categories} />
 }

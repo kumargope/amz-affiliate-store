@@ -8,10 +8,16 @@ export default async function NewProductPage() {
   const admin = await getAdminFromCookie()
   if (!admin) redirect('/admin/login')
 
-  const categories = await prisma.category.findMany({
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true },
-  })
+  let categories: any[] = []
+
+  try {
+    categories = await prisma.category.findMany({
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true },
+    })
+  } catch (error) {
+    console.error('Error fetching categories for new product page:', error)
+  }
 
   return <ProductForm categories={categories} />
 }

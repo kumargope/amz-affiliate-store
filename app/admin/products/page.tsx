@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { getAdminFromCookie } from '@/lib/auth'
 import { Plus, Edit, ExternalLink, Zap, Star, CheckCircle, XCircle } from 'lucide-react'
 import DeleteProductButton from './DeleteProductButton'
+import SyncBestSellersButton from './SyncBestSellersButton'
 
 export default async function AdminProductsPage() {
   const admin = await getAdminFromCookie()
@@ -33,13 +34,16 @@ export default async function AdminProductsPage() {
           <p className="text-xs text-slate-500 mt-1">Manage storefront items, affiliate links & Amazon compliance.</p>
         </div>
 
-        <Link
-          href="/admin/products/new"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs shadow-md transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Product</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <SyncBestSellersButton />
+          <Link
+            href="/admin/products/new"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs shadow-md transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Product</span>
+          </Link>
+        </div>
       </div>
 
       {/* Table */}

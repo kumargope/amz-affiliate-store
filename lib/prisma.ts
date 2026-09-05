@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 function prepareWritableDatabase() {
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL && process.env.DATABASE_URL?.startsWith('file:')) {
     try {
       const tmpDbPath = '/tmp/dev.db'
       const bundledDbPath = path.join(process.cwd(), 'prisma', 'dev.db')

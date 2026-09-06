@@ -4,6 +4,7 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import AffiliateDisclosure from '@/components/AffiliateDisclosure'
+import SpinWinRewardModal from '@/components/SpinWinRewardModal'
 import { prisma } from '@/lib/prisma'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -57,10 +58,11 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} flex flex-col min-h-screen`}>
+      <body className={`${inter.className} flex flex-col min-h-screen relative`}>
         <AffiliateDisclosure variant="banner" />
         <Navbar categories={categories} />
         <main className="flex-1">{children}</main>
+        <SpinWinRewardModal />
         <Footer />
       </body>
     </html>

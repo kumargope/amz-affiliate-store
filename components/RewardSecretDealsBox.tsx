@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Sparkles, Gift, Flame, Zap, Award } from 'lucide-react'
+import { Sparkles, Gift, Zap } from 'lucide-react'
 
 interface RewardSecretDealsBoxProps {
   query: string
@@ -12,6 +12,8 @@ export default function RewardSecretDealsBox({ query }: RewardSecretDealsBoxProp
   const [particles, setParticles] = useState<
     { id: number; x: number; y: number; vx: number; vy: number; emoji: string; size: number }[]
   >([])
+
+  const displayQuery = query.trim().toUpperCase()
 
   const handleReveal = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
@@ -27,17 +29,17 @@ export default function RewardSecretDealsBox({ query }: RewardSecretDealsBoxProp
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
 
-    for (let i = 0; i < 45; i++) {
+    for (let i = 0; i < 50; i++) {
       const angle = Math.random() * Math.PI * 2
-      const speed = 4 + Math.random() * 12
+      const speed = 5 + Math.random() * 14
       newParticles.push({
         id: i,
         x: centerX,
         y: centerY,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 2, // Slight upward bias
+        vy: Math.sin(angle) * speed - 3,
         emoji: emojis[Math.floor(Math.random() * emojis.length)],
-        size: 18 + Math.floor(Math.random() * 20),
+        size: 20 + Math.floor(Math.random() * 22),
       })
     }
 
@@ -45,7 +47,6 @@ export default function RewardSecretDealsBox({ query }: RewardSecretDealsBoxProp
 
     const targetUrl = `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=amzfinds063-20`
 
-    // Open link after 500ms explosion effect
     setTimeout(() => {
       window.open(targetUrl, '_blank', 'noopener,noreferrer')
       setIsExploding(false)
@@ -54,48 +55,49 @@ export default function RewardSecretDealsBox({ query }: RewardSecretDealsBoxProp
   }
 
   return (
-    <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 p-6 sm:p-8 text-slate-950 shadow-xl border-2 border-amber-300/80 animate-in fade-in slide-in-from-top-4 duration-300">
+    <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 p-6 sm:p-10 text-slate-950 shadow-2xl border-4 border-amber-300 animate-in fade-in slide-in-from-top-4 duration-300">
       {/* Background Decorative Glow Bubbles */}
-      <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/20 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-amber-300/30 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -top-16 -right-16 w-56 h-56 bg-white/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-amber-200/40 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        {/* Left Side: Mystery Gift / Reward Icon + Text */}
-        <div className="flex items-start gap-4 text-center md:text-left">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-950 text-amber-400 flex items-center justify-center shrink-0 shadow-lg border border-amber-400/40 transform hover:rotate-6 transition-transform">
-            <Gift className="w-8 h-8 animate-bounce" />
+        {/* Left Side: Big Gift Box Icon & Big Bold Bada Heading */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-slate-950 text-amber-400 flex items-center justify-center shrink-0 shadow-2xl border-2 border-amber-400/50 transform hover:scale-110 hover:rotate-6 transition-all">
+            <Gift className="w-10 h-10 animate-bounce" />
           </div>
 
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-950/90 text-amber-400 rounded-full text-[11px] font-black uppercase tracking-wider mb-2 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-slate-950/90 text-amber-400 rounded-full text-xs font-black uppercase tracking-wider mb-2 shadow-md">
+              <Sparkles className="w-4 h-4 text-amber-400 fill-amber-400" />
               <span>Secret VIP Reward Box</span>
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight leading-tight">
-              🎁 Unlock Exclusive Secret Deals & Extra Discounts for &quot;{query}&quot;!
+            {/* BADA BADA SIZE ME RESULT DISPLAY */}
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight leading-tight uppercase">
+              🎯 YOUR RESULT FOR &quot;{displayQuery}&quot;
             </h2>
 
-            <p className="text-xs sm:text-sm font-bold text-slate-900/90 mt-1 max-w-xl">
-              Get instant access to limited-time price drops, verified seller coupons, and extra reward savings matching your search!
+            <p className="text-xs sm:text-base font-extrabold text-slate-900/90 mt-1 max-w-xl">
+              Click below to reveal exclusive secret deals, extra reward discounts, and top USA price drops for &quot;{displayQuery}&quot;!
             </p>
           </div>
         </div>
 
-        {/* Right Side: Animated BOOM Reward Button */}
+        {/* Right Side: Big Animated BOOM Reward Button */}
         <a
           href={`https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=amzfinds063-20`}
           onClick={handleReveal}
-          className={`inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-950 hover:bg-slate-900 active:scale-95 text-amber-400 font-black text-sm rounded-2xl shadow-2xl transition-all cursor-pointer shrink-0 border-2 border-amber-400/50 ${
-            isExploding ? 'scale-110 ring-4 ring-amber-300 animate-pulse' : 'hover:scale-105'
+          className={`inline-flex items-center justify-center gap-3 px-8 py-5 bg-slate-950 hover:bg-slate-900 active:scale-95 text-amber-400 font-black text-base rounded-2xl shadow-2xl transition-all cursor-pointer shrink-0 border-2 border-amber-400/60 uppercase tracking-wide ${
+            isExploding ? 'scale-110 ring-4 ring-amber-200 animate-pulse' : 'hover:scale-105'
           }`}
         >
-          <Zap className="w-5 h-5 text-amber-400 fill-amber-400" />
-          <span>{isExploding ? '💥 BOOM! Opening Secret Deals...' : '⚡ Reveal All Secret Deals Now'}</span>
+          <Zap className="w-6 h-6 text-amber-400 fill-amber-400" />
+          <span>{isExploding ? '💥 BOOM! Opening Secret Deals...' : `⚡ REVEAL DEALS FOR "${displayQuery}" NOW`}</span>
         </a>
       </div>
 
-      {/* BOOM Particle Canvas / Overlay */}
+      {/* BOOM Particle Explosion Overlay */}
       {particles.length > 0 && (
         <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
           {particles.map((p) => (
@@ -107,8 +109,8 @@ export default function RewardSecretDealsBox({ query }: RewardSecretDealsBoxProp
                 top: `${p.y + p.vy * 15}px`,
                 fontSize: `${p.size}px`,
                 transition: 'all 0.5s ease-out',
-                transform: `translate(${p.vx * 20}px, ${p.vy * 20}px) scale(1.5)`,
-                opacity: 0.9,
+                transform: `translate(${p.vx * 22}px, ${p.vy * 22}px) scale(1.6)`,
+                opacity: 0.95,
               }}
             >
               {p.emoji}

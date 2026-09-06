@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import ProductCard from '@/components/ProductCard'
 import Link from 'next/link'
-import { Search as SearchIcon, Filter, Sparkles } from 'lucide-react'
+import { Search as SearchIcon, Filter, Sparkles, ExternalLink } from 'lucide-react'
 import { ensureSearchProducts } from '@/lib/auto-search-importer'
 
 export const metadata: Metadata = {
@@ -31,13 +31,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let autoImportedCount = 0
 
   try {
-    // 1. Fetch categories for filter dropdown
     categories = await prisma.category.findMany({
       orderBy: { name: 'asc' },
       select: { id: true, name: true, slug: true },
     })
 
-    // Helper to fetch products for current query & filters
     const fetchProducts = async () => {
       const where: any = { isActive: true }
 
@@ -73,14 +71,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       })
     }
 
-    // 2. Initial DB search
     products = await fetchProducts()
 
-    // 3. ON-THE-FLY AI AUTO-IMPORTER FOR ANY SEARCH QUERY (A to Z)
+    // ON-THE-FLY AI AUTO-IMPORTER FOR ANY SEARCH QUERY (A to Z)
     if (query.trim().length >= 2 && products.length < 4) {
       autoImportedCount = await ensureSearchProducts(query)
       if (autoImportedCount > 0) {
-        // Re-fetch products so newly created items appear instantly!
         products = await fetchProducts()
       }
     }
@@ -104,7 +100,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 type="text"
                 name="q"
                 defaultValue={query}
-                placeholder="Search ANY product (e.g. gaming chair, drone, nike, dyson, coffee maker)..."
+                placeholder="Search ANY product (e.g. gaming chair, fitbit, drone, nike, dyson)..."
                 className="w-full pl-11 pr-4 py-3 bg-slate-100/80 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
               />
               <SearchIcon className="w-5 h-5 text-slate-400 absolute left-4 top-3.5 pointer-events-none" />
@@ -143,7 +139,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </button>
           </form>
 
-          {/* Auto-Import Banner Notification */}
+          {/* Banner 1: View All Amazon Results Button Directly Below Search Bar */}
+          {query && (
+            <div className="mb-6 bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 p-5 rounded-2xl text-slate-950 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 border border-amber-400/50">
+              <div>
+                <div className="flex items-center gap-2 font-black text-sm uppercase tracking-wider text-slate-950">
+                  <Sparkles className="w-4 h-4 text-slate-950 fill-slate-950" />
+                  <span>Live Amazon USA Results</span>
+                </div>
+                <p className="text-xs font-semibold text-slate-900/90 mt-1">
+                  Compare thousands of live matching products directly on Amazon with your affiliate discount tag.
+                </p>
+              </div>
+              <a
+                href={`https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=amzfinds063-20`}
+                target="_blank"
+                rel="nofollow sponsored noopener"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-950 hover:bg-slate-900 active:scale-95 text-amber-400 font-bold text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
+              >
+                <span>View All Results on Amazon</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+          )}
+
+          {/* Banner 2: Auto-Import Notification */}
           {autoImportedCount > 0 && (
             <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-3 rounded-2xl flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 animate-pulse" />

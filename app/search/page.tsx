@@ -2,8 +2,9 @@ import React from 'react'
 import { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import ProductCard from '@/components/ProductCard'
+import RewardSecretDealsBox from '@/components/RewardSecretDealsBox'
 import Link from 'next/link'
-import { Search as SearchIcon, Filter, Sparkles, ExternalLink } from 'lucide-react'
+import { Search as SearchIcon, Filter, Sparkles } from 'lucide-react'
 import { ensureSearchProducts } from '@/lib/auto-search-importer'
 
 export const metadata: Metadata = {
@@ -87,7 +88,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="bg-slate-50 min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Search Header */}
+        {/* Search Header & Form */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm mb-8">
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-6">
             {query ? `Search results for "${query}"` : 'Browse Product Storefront'}
@@ -100,7 +101,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 type="text"
                 name="q"
                 defaultValue={query}
-                placeholder="Search ANY product (e.g. gaming chair, fitbit, drone, nike, dyson)..."
+                placeholder="Search ANY product (e.g. fitbit, gaming chair, drone, nike, dyson)..."
                 className="w-full pl-11 pr-4 py-3 bg-slate-100/80 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
               />
               <SearchIcon className="w-5 h-5 text-slate-400 absolute left-4 top-3.5 pointer-events-none" />
@@ -139,40 +140,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </button>
           </form>
 
-          {/* Banner 1: View All Amazon Results Button Directly Below Search Bar */}
-          {query && (
-            <div className="mb-6 bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 p-5 rounded-2xl text-slate-950 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 border border-amber-400/50">
-              <div>
-                <div className="flex items-center gap-2 font-black text-sm uppercase tracking-wider text-slate-950">
-                  <Sparkles className="w-4 h-4 text-slate-950 fill-slate-950" />
-                  <span>Live Amazon USA Results</span>
-                </div>
-                <p className="text-xs font-semibold text-slate-900/90 mt-1">
-                  Compare thousands of live matching products directly on Amazon with your affiliate discount tag.
-                </p>
-              </div>
-              <a
-                href={`https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=amzfinds063-20`}
-                target="_blank"
-                rel="nofollow sponsored noopener"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-950 hover:bg-slate-900 active:scale-95 text-amber-400 font-bold text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
-              >
-                <span>View All Results on Amazon</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
-          )}
-
-          {/* Banner 2: Auto-Import Notification */}
-          {autoImportedCount > 0 && (
-            <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-3 rounded-2xl flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 animate-pulse" />
-              <span>
-                ⚡ Auto-imported {autoImportedCount} brand new Amazon USA products for &quot;{query}&quot;!
-              </span>
-            </div>
-          )}
-
           {/* Quick Active Filter Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
             <span className="flex items-center gap-1 text-slate-400">
@@ -191,6 +158,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             )}
           </div>
         </div>
+
+        {/* Secret VIP Reward Deals Box (Placed right below search header) */}
+        {query && <RewardSecretDealsBox query={query} />}
+
+        {/* Auto-Import Notification */}
+        {autoImportedCount > 0 && (
+          <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-3.5 rounded-2xl flex items-center gap-2 shadow-sm">
+            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 animate-pulse" />
+            <span>
+              ⚡ Auto-imported {autoImportedCount} brand new products for &quot;{query}&quot;!
+            </span>
+          </div>
+        )}
 
         {/* Results Grid */}
         {products.length > 0 ? (

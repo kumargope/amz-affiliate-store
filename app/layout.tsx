@@ -26,6 +26,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     verification: {
       google: 'google0479d8ab26f8c30d',
+      other: {
+        'p:domain_verify': '52fc436f906da3c2e83935b9d6f33d20',
+      },
     },
     alternates: {
       types: {

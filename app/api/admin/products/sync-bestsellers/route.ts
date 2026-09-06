@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getAdminFromCookie } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
-import { repairInvalidAmazonUrls } from '@/lib/auto-search-importer'
+import { repairInvalidAmazonUrls, getUniqueProductImage } from '@/lib/auto-search-importer'
 
 interface ProductBlueprint {
   title: string
@@ -436,7 +436,7 @@ export async function POST(req: Request) {
             slug: item.slug,
             categoryId,
             amazonAffiliateUrl: item.amazonAffiliateUrl,
-            imageUrl: item.imageUrl,
+            imageUrl: getUniqueProductImage(item.title, item.categorySlug),
             price: item.price,
             originalPrice: item.originalPrice || null,
             rating: item.rating,

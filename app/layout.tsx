@@ -27,6 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
     verification: {
       google: 'google0479d8ab26f8c30d',
     },
+    alternates: {
+      types: {
+        'application/rss+xml': `${siteUrl}/api/rss`,
+      },
+    },
     openGraph: {
       title: 'AmzFinds | Discover Hand-Picked Amazon Products',
       description:

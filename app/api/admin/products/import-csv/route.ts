@@ -152,14 +152,23 @@ export async function POST(req: Request) {
         // Check header indices
         headers.forEach((h, colIdx) => {
           const val = row[colIdx] || ''
-          if (h.includes('title') || h.includes('name')) title = val
-          else if (h.includes('category')) categoryName = val
-          else if (h.includes('description')) description = val
-          else if (h.includes('amazon') || h.includes('url') || h.includes('affiliate')) affiliateUrl = val
-          else if (h.includes('imageurl') || h.includes('image')) rawImageUrl = val
-          else if (h.includes('slug')) customSlug = val
-          else if (h.includes('seotitle')) seoTitle = val
-          else if (h.includes('seokeywords')) seoKeywords = val
+          if (h.includes('image') || h.includes('img') || h.includes('photo') || h.includes('picture')) {
+            rawImageUrl = val
+          } else if (h.includes('title') || h.includes('name')) {
+            title = val
+          } else if (h.includes('category')) {
+            categoryName = val
+          } else if (h.includes('description')) {
+            description = val
+          } else if (h.includes('amazon') || h.includes('affiliate') || h.includes('url') || h.includes('link')) {
+            affiliateUrl = val
+          } else if (h.includes('slug')) {
+            customSlug = val
+          } else if (h.includes('seotitle')) {
+            seoTitle = val
+          } else if (h.includes('seokeywords') || h.includes('seodescription')) {
+            seoKeywords = val
+          }
         })
 
         // Fallback row mapping by position if header matching failed
@@ -197,14 +206,14 @@ export async function POST(req: Request) {
           finalAffiliateUrl += (finalAffiliateUrl.includes('?') ? '&' : '?') + `tag=${tag}`
         }
 
-        // Resolve Image URL
+        // Resolve Image URL: If direct image URL is provided (http/https), use it 100% directly!
         let finalImageUrl = rawImageUrl
-        if (
-          !finalImageUrl ||
-          !finalImageUrl.startsWith('http') ||
-          finalImageUrl.toUpperCase().includes('VERIFY VIA') ||
-          finalImageUrl.toUpperCase().includes('AMAZON')
-        ) {
+        const isDirectImage =
+          finalImageUrl &&
+          (finalImageUrl.startsWith('http://') || finalImageUrl.startsWith('https://')) &&
+          !finalImageUrl.toUpperCase().includes('VERIFY VIA')
+
+        if (!isDirectImage) {
           finalImageUrl = getRandomImage(catSlug, title)
         }
 

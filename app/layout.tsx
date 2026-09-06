@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma'
 const inter = Inter({ subsets: ['latin'] })
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://amz-affiliate-store.vercel.app'
   return {
     metadataBase: new URL(siteUrl),
     title: {
@@ -23,6 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: '/logo.png',
       shortcut: '/logo.png',
       apple: '/logo.png',
+    },
+    verification: {
+      google: 'google0479d8ab26f8c30d',
     },
     openGraph: {
       title: 'AmzFinds | Discover Hand-Picked Amazon Products',

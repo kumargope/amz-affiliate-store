@@ -223,9 +223,9 @@ export async function ensureSearchProducts(query: string) {
       where: {
         isActive: true,
         OR: [
-          { title: { contains: trimmedQuery, mode: 'insensitive' } },
-          { description: { contains: trimmedQuery, mode: 'insensitive' } },
-          { shortDescription: { contains: trimmedQuery, mode: 'insensitive' } },
+          { title: { contains: trimmedQuery } },
+          { description: { contains: trimmedQuery } },
+          { shortDescription: { contains: trimmedQuery } },
         ],
       },
     })

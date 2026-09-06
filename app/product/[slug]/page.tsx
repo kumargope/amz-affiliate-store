@@ -7,6 +7,7 @@ import BuyNowButton from '@/components/BuyNowButton'
 import ProductCard from '@/components/ProductCard'
 import AffiliateDisclosure from '@/components/AffiliateDisclosure'
 import ShareButtons from '@/components/ShareButtons'
+import AdsterraBanner from '@/components/AdsterraBanner'
 import { Star, CheckCircle2, XCircle, Tag, ShieldCheck, ArrowLeft, Zap } from 'lucide-react'
 
 interface ProductPageProps {
@@ -332,6 +333,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             )}
           </div>
         </div>
+
+        {/* Adsterra Sponsor Banner */}
+        <AdsterraBanner />
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (

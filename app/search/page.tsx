@@ -44,9 +44,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       if (query) {
         where.OR = [
-          { title: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } },
-          { shortDescription: { contains: query, mode: 'insensitive' } },
+          { title: { contains: query } },
+          { description: { contains: query } },
+          { shortDescription: { contains: query } },
         ]
       }
 

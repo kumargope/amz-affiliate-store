@@ -5,6 +5,7 @@ import CategoryGrid from '@/components/CategoryGrid'
 import ProductCard from '@/components/ProductCard'
 import WhyShopUs from '@/components/WhyShopUs'
 import LuckyDealSpinner from '@/components/LuckyDealSpinner'
+import AdsterraBanner from '@/components/AdsterraBanner'
 import { prisma } from '@/lib/prisma'
 import { Flame, Sparkles, ArrowRight, Gift, Trophy } from 'lucide-react'
 
@@ -78,6 +79,9 @@ export default async function HomePage() {
       {/* 3. Featured Categories Grid */}
       <CategoryGrid categories={categories} />
 
+      {/* Adsterra Banner Ad #1 */}
+      <AdsterraBanner />
+
       {/* 4. Gamified Lucky Deal Spinner Wheel */}
       {popularProducts.length > 0 && <LuckyDealSpinner products={popularProducts} />}
 
@@ -112,6 +116,9 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Adsterra Banner Ad #2 */}
+      <AdsterraBanner />
 
       {/* 6. Full Storefront Showcase Section - Display ALL Products */}
       {allProducts.length > 0 && (

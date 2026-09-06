@@ -3,7 +3,8 @@ import { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import ProductCard from '@/components/ProductCard'
 import Link from 'next/link'
-import { Search as SearchIcon, Filter, SlidersHorizontal } from 'lucide-react'
+import { Search as SearchIcon, Filter, Sparkles } from 'lucide-react'
+import { ensureSearchProducts } from '@/lib/auto-search-importer'
 
 export const metadata: Metadata = {
   title: 'Search Amazon Products | AmzFinds',
@@ -27,50 +28,62 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   let categories: any[] = []
   let products: any[] = []
+  let autoImportedCount = 0
 
   try {
-    // Fetch categories for filter dropdown
+    // 1. Fetch categories for filter dropdown
     categories = await prisma.category.findMany({
       orderBy: { name: 'asc' },
       select: { id: true, name: true, slug: true },
     })
 
-    // Build filter conditions
-    const where: any = {
-      isActive: true,
+    // Helper to fetch products for current query & filters
+    const fetchProducts = async () => {
+      const where: any = { isActive: true }
+
+      if (query) {
+        where.OR = [
+          { title: { contains: query } },
+          { description: { contains: query } },
+          { shortDescription: { contains: query } },
+        ]
+      }
+
+      if (categorySlug) {
+        const selectedCat = categories.find((c) => c.slug === categorySlug)
+        if (selectedCat) {
+          where.categoryId = selectedCat.id
+        }
+      }
+
+      if (featuredOnly) {
+        where.isFeatured = true
+      }
+
+      let orderBy: any = { updatedAt: 'desc' }
+      if (sort === 'popular') orderBy = [{ rating: 'desc' }, { updatedAt: 'desc' }]
+      if (sort === 'price-asc') orderBy = { price: 'asc' }
+      if (sort === 'price-desc') orderBy = { price: 'desc' }
+      if (sort === 'rating') orderBy = { rating: 'desc' }
+
+      return prisma.product.findMany({
+        where,
+        orderBy,
+        include: { category: { select: { name: true, slug: true } } },
+      })
     }
 
-    if (query) {
-      where.OR = [
-        { title: { contains: query } },
-        { description: { contains: query } },
-        { shortDescription: { contains: query } },
-      ]
-    }
+    // 2. Initial DB search
+    products = await fetchProducts()
 
-    if (categorySlug) {
-      const selectedCat = categories.find((c) => c.slug === categorySlug)
-      if (selectedCat) {
-        where.categoryId = selectedCat.id
+    // 3. ON-THE-FLY AI AUTO-IMPORTER FOR ANY SEARCH QUERY (A to Z)
+    if (query.trim().length >= 2 && products.length < 4) {
+      autoImportedCount = await ensureSearchProducts(query)
+      if (autoImportedCount > 0) {
+        // Re-fetch products so newly created items appear instantly!
+        products = await fetchProducts()
       }
     }
-
-    if (featuredOnly) {
-      where.isFeatured = true
-    }
-
-    // Build sorting condition
-    let orderBy: any = { updatedAt: 'desc' }
-    if (sort === 'popular') orderBy = [{ rating: 'desc' }, { updatedAt: 'desc' }]
-    if (sort === 'price-asc') orderBy = { price: 'asc' }
-    if (sort === 'price-desc') orderBy = { price: 'desc' }
-    if (sort === 'rating') orderBy = { rating: 'desc' }
-
-    products = await prisma.product.findMany({
-      where,
-      orderBy,
-      include: { category: { select: { name: true, slug: true } } },
-    })
   } catch (error) {
     console.error('Error fetching search page products:', error)
   }
@@ -91,7 +104,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 type="text"
                 name="q"
                 defaultValue={query}
-                placeholder="Search products by title, feature, or keyword..."
+                placeholder="Search ANY product (e.g. gaming chair, drone, nike, dyson, coffee maker)..."
                 className="w-full pl-11 pr-4 py-3 bg-slate-100/80 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
               />
               <SearchIcon className="w-5 h-5 text-slate-400 absolute left-4 top-3.5 pointer-events-none" />
@@ -126,9 +139,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type="submit"
               className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-2xl text-sm shadow-md transition-colors"
             >
-              Apply Filter
+              Search & Add
             </button>
           </form>
+
+          {/* Auto-Import Banner Notification */}
+          {autoImportedCount > 0 && (
+            <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-3 rounded-2xl flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 animate-pulse" />
+              <span>
+                ⚡ Auto-imported {autoImportedCount} brand new Amazon USA products for &quot;{query}&quot;!
+              </span>
+            </div>
+          )}
 
           {/* Quick Active Filter Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
@@ -159,7 +182,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ) : (
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
             <h3 className="text-lg font-bold text-slate-800 mb-2">No matching products found</h3>
-            <p className="text-slate-500 text-xs mb-6">Try searching with a broader keyword or resetting filters.</p>
+            <p className="text-slate-500 text-xs mb-6">Try searching with another keyword.</p>
             <Link
               href="/search"
               className="inline-flex items-center justify-center px-6 py-2.5 bg-amber-500 text-slate-950 text-xs font-bold rounded-xl"

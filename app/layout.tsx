@@ -19,6 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description:
       'Curated Amazon product discovery storefront. Hand-picked products, authentic recommendations, and direct Amazon affiliate deals.',
+    icons: {
+      icon: '/logo.png',
+      shortcut: '/logo.png',
+      apple: '/logo.png',
+    },
     openGraph: {
       title: 'AmzFinds | Discover Hand-Picked Amazon Products',
       description:
@@ -27,12 +32,21 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'AmzFinds',
       locale: 'en_US',
       type: 'website',
+      images: [
+        {
+          url: '/logo.png',
+          width: 512,
+          height: 512,
+          alt: 'AmzFinds Logo',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'AmzFinds | Discover Hand-Picked Amazon Products',
       description:
         'Curated Amazon product discovery storefront. Hand-picked products, authentic recommendations, and direct Amazon affiliate deals.',
+      images: ['/logo.png'],
     },
     robots: {
       index: true,

@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Search, Menu, X, ShoppingBag, Flame, Sparkles, Grid } from 'lucide-react'
+import { Search, Menu, X, Flame, Sparkles, Grid } from 'lucide-react'
 
 interface NavbarProps {
   categories?: { name: string; slug: string }[]
@@ -29,17 +29,11 @@ export default function Navbar({ categories = [] }: NavbarProps) {
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-md group-hover:scale-105 transition-transform">
-              <ShoppingBag className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-black text-xl tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors">
-                AmzFinds
-              </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-amber-600 -mt-1">
-                Curated Storefront
-              </span>
-            </div>
+            <img
+              src="/logo.png"
+              alt="AmzFinds Logo"
+              className="h-10 sm:h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-sm"
+            />
           </Link>
 
           {/* Desktop Search Bar */}
@@ -86,10 +80,10 @@ export default function Navbar({ categories = [] }: NavbarProps) {
                   ) : (
                     <>
                       <Link href="/category/electronics" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Electronics</Link>
-                      <Link href="/category/home-kitchen" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Home & Kitchen</Link>
-                      <Link href="/category/beauty" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Beauty & Personal Care</Link>
-                      <Link href="/category/fashion" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Fashion & Apparel</Link>
-                      <Link href="/category/fitness" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Fitness & Sports</Link>
+                      <Link href="/category/home-kitchen" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Home &amp; Kitchen</Link>
+                      <Link href="/category/beauty" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Beauty &amp; Personal Care</Link>
+                      <Link href="/category/fashion" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Fashion &amp; Apparel</Link>
+                      <Link href="/category/fitness" className="px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-xl">Fitness &amp; Sports</Link>
                     </>
                   )}
                 </div>
@@ -154,7 +148,7 @@ export default function Navbar({ categories = [] }: NavbarProps) {
             className="flex items-center gap-2 py-2 text-sm font-semibold text-slate-800 hover:text-amber-600"
           >
             <Sparkles className="w-4 h-4 text-amber-500" />
-            <span>Deals & Discounts</span>
+            <span>Deals &amp; Discounts</span>
           </Link>
           <Link
             href="/search?sort=popular"

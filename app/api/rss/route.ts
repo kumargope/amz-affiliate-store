@@ -12,7 +12,7 @@ export async function GET() {
       where: { isActive: true },
       include: { category: { select: { name: true, slug: true } } },
       orderBy: { updatedAt: 'desc' },
-      take: 50,
+      take: 100,
     })
   } catch (e) {
     console.error('Error fetching products for RSS feed:', e)
@@ -22,24 +22,37 @@ export async function GET() {
     .map((product) => {
       const productUrl = `${baseUrl}/product/${product.slug}`
       const pubDate = new Date(product.updatedAt || product.createdAt || Date.now()).toUTCString()
-      const priceStr = product.price ? `$${product.price.toFixed(2)}` : 'Check Amazon'
-      const imageAttr = product.imageUrl ? `<media:content url="${escapeXml(product.imageUrl)}" medium="image" />` : ''
+      const priceVal = product.price ? `${product.price.toFixed(2)} USD` : '29.99 USD'
+      const imageUrl = escapeXml(product.imageUrl)
+      const titleStr = escapeXml(product.title)
+      const descStr = escapeXml(product.shortDescription || product.description || product.title)
+      const categoryStr = escapeXml(product.category?.name || 'Deals')
 
       return `
     <item>
-      <title>${escapeXml(product.title)} - ${priceStr}</title>
+      <title>${titleStr}</title>
       <link>${productUrl}</link>
       <guid isPermaLink="true">${productUrl}</guid>
       <pubDate>${pubDate}</pubDate>
-      <description>${escapeXml(product.shortDescription || product.description || product.title)} - Price: ${priceStr}</description>
-      ${imageAttr}
-      <category>${escapeXml(product.category?.name || 'Deals')}</category>
+      <description>${descStr}</description>
+      <category>${categoryStr}</category>
+      <enclosure url="${imageUrl}" type="image/jpeg" length="50000" />
+      <media:content url="${imageUrl}" medium="image" type="image/jpeg" />
+      <g:id>${escapeXml(product.id || product.slug)}</g:id>
+      <g:title>${titleStr}</g:title>
+      <g:description>${descStr}</g:description>
+      <g:link>${productUrl}</g:link>
+      <g:image_link>${imageUrl}</g:image_link>
+      <g:price>${priceVal}</g:price>
+      <g:availability>in stock</g:availability>
+      <g:condition>new</g:condition>
+      <g:brand>Amazon USA</g:brand>
     </item>`
     })
     .join('')
 
   const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
     <title>AmzFinds | Hand-Picked Amazon Deals &amp; USA Products</title>
     <link>${baseUrl}</link>
